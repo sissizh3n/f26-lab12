@@ -1,9 +1,24 @@
-# It should check out the repo, set up Python, install from `requirements-dev.txt`, and run `pytest`.
 on: 
   pull_request: 
   push: 
     branches: [main]
 jobs: 
+  gate:  
+    runs-on: ubuntu-latest
+    strategy: 
+      fail-fast: false
+      matrix: 
+        check: 
+          - ruff check .
+          - mypy
+          - pip-audit -r requirements.txt
+    steps: 
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v7
+        with: 
+          python-version: '3.12'
+      - run: pip install -r requirements-dev.txt
+      - run: ${{ matrix.check }}
   test:
     runs-on: ubuntu-latest
     steps:
